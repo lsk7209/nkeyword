@@ -187,15 +187,22 @@ export default function DataPage() {
         let data: Dataset = [];
         
         try {
+          console.log('[데이터 로드] API 호출 시작: /api/data');
           const response = await fetch('/api/data');
+          console.log('[데이터 로드] API 응답 상태:', response.status, response.statusText);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
           const result = await response.json();
           console.log('[데이터 로드] API 응답:', result);
           
           if (result.success) {
             data = result.data;
-            console.log(`[데이터 로드] API에서 ${data.length}개 키워드 로드됨`);
+            console.log(`[데이터 로드] ✅ API에서 ${data.length}개 키워드 로드됨`);
           } else {
-            console.error('[데이터 로드] API 오류:', result.error);
+            console.error('[데이터 로드] ❌ API 오류:', result.error);
             // API 실패 시 LocalStorage 폴백 (클라이언트 환경에서만)
             if (typeof window !== 'undefined') {
               data = loadDataset();
@@ -203,7 +210,7 @@ export default function DataPage() {
             }
           }
         } catch (error) {
-          console.error('[데이터 로드] API 호출 오류:', error);
+          console.error('[데이터 로드] ❌ API 호출 오류:', error);
           // API 실패 시 LocalStorage 폴백 (클라이언트 환경에서만)
           if (typeof window !== 'undefined') {
             data = loadDataset();
@@ -1049,18 +1056,27 @@ export default function DataPage() {
   // 🔄 데이터 새로고침 함수
   const handleRefreshData = useCallback(async () => {
     try {
+      console.log('[데이터 새로고침] 시작');
       const response = await fetch('/api/data');
+      console.log('[데이터 새로고침] API 응답 상태:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const result = await response.json();
+      console.log('[데이터 새로고침] API 응답:', result);
       
       if (result.success) {
         setDataset(result.data);
-        console.log(`[데이터 새로고침] ${result.data.length}개 키워드 로드됨`);
+        console.log(`[데이터 새로고침] ✅ ${result.data.length}개 키워드 로드됨`);
         alert(`✅ 데이터 새로고침 완료!\n\n${result.data.length}개 키워드가 표시됩니다.`);
       } else {
+        console.error('[데이터 새로고침] ❌ API 오류:', result.error);
         alert(`❌ 데이터 새로고침 실패: ${result.error}`);
       }
     } catch (error) {
-      console.error('[데이터 새로고침] 오류:', error);
+      console.error('[데이터 새로고침] ❌ 오류:', error);
       alert('❌ 데이터 새로고침 중 오류가 발생했습니다.');
     }
   }, []);
@@ -1071,6 +1087,7 @@ export default function DataPage() {
     
     try {
       setIsMigrating(true);
+      console.log('[테스트 데이터] 생성 요청 시작');
       
       const response = await fetch('/api/test-data', {
         method: 'POST',
@@ -1082,7 +1099,14 @@ export default function DataPage() {
         })
       });
       
+      console.log('[테스트 데이터] API 응답 상태:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const result = await response.json();
+      console.log('[테스트 데이터] API 응답:', result);
       
       if (result.success) {
         alert(`✅ 테스트 데이터 생성 완료!\n\n${result.message}`);

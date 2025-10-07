@@ -8,10 +8,15 @@ import type { KeywordData } from '@/lib/types';
  */
 export async function GET(request: NextRequest) {
   try {
+    console.log('[데이터 조회] API 호출 시작');
     const data: KeywordData[] = getMemoryStorage();
     
     console.log(`[데이터 조회] 메모리 저장소에서 ${data.length}개 키워드 조회`);
-    console.log('[데이터 조회] 조회된 데이터:', data);
+    console.log('[데이터 조회] 조회된 데이터:', JSON.stringify(data, null, 2));
+    
+    if (data.length === 0) {
+      console.log('[데이터 조회] ⚠️ 메모리 저장소가 비어있습니다');
+    }
     
     return NextResponse.json({
       success: true,
