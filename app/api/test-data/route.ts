@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStorageAdapter } from '@/lib/storage-adapter';
+import { setMemoryStorage } from '@/lib/memory-storage';
 
 /**
  * 테스트 데이터 생성 API
@@ -62,8 +63,10 @@ export async function POST(request: NextRequest) {
         }
       ];
       
-      const storage = getStorageAdapter();
-      await storage.addKeywords(testData);
+      // 메모리 저장소에 직접 저장
+      setMemoryStorage(testData);
+      
+      console.log(`[테스트 데이터] 메모리 저장소에 ${testData.length}개 키워드 저장 완료`);
       
       return NextResponse.json({
         success: true,

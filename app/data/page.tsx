@@ -181,10 +181,27 @@ export default function DataPage() {
         // 설정은 먼저 로드 (빠름)
         setAutoCollectConfig(getAutoCollectConfig());
         
-        console.log('[성능] 데이터 로딩 시작 (Worker 사용)');
+        console.log('[성능] 데이터 로딩 시작');
         
-        // 🚀 무한 루프 방지: 동기 방식 사용
-        const data = loadDataset();
+        // 🚀 서버 환경에서는 API로 데이터 로드
+        let data: Dataset = [];
+        
+        if (typeof window === 'undefined') {
+          // 서버 환경에서는 API 호출
+          try {
+            const response = await fetch('/api/data');
+            const result = await response.json();
+            if (result.success) {
+              data = result.data;
+            }
+          } catch (error) {
+            console.error('[서버 데이터 로드] 오류:', error);
+          }
+        } else {
+          // 클라이언트 환경에서는 LocalStorage 사용
+          data = loadDataset();
+        }
+        
         const loadTime = performance.now() - startTime;
         console.log(`[성능] ✅ 데이터 로딩 완료: ${data.length}개, ${loadTime.toFixed(0)}ms`);
         
