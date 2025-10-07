@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStorageAdapter } from '@/lib/storage-adapter';
-import { setMemoryStorage } from '@/lib/memory-storage';
 import type { KeywordData } from '@/lib/types';
 
 /**
@@ -64,17 +63,17 @@ export async function POST(request: NextRequest) {
         }
       ];
       
-      // 메모리 저장소에 직접 저장
-      setMemoryStorage(testData);
+      // 저장소 어댑터를 통해 저장
+      const storageAdapter = getStorageAdapter();
+      await storageAdapter.addKeywords(testData);
       
-      console.log(`[테스트 데이터] 메모리 저장소에 ${testData.length}개 키워드 저장 완료`);
+      console.log(`[테스트 데이터] 저장소에 ${testData.length}개 키워드 저장 완료`);
       console.log('[테스트 데이터] 저장된 데이터:', JSON.stringify(testData, null, 2));
       
       // 저장 후 즉시 확인
-      const { getMemoryStorage } = await import('@/lib/memory-storage');
-      const storedData = getMemoryStorage();
+      const storedData = await storageAdapter.getKeywords();
       console.log(`[테스트 데이터] 저장 확인: ${storedData.length}개 키워드`);
-      console.log('[테스트 데이터] 저장된 키워드들:', storedData.map(k => k.keyword));
+      console.log('[테스트 데이터] 저장된 키워드들:', storedData.map((k: any) => k.keyword));
       
       return NextResponse.json({
         success: true,

@@ -167,14 +167,15 @@ export class LocalStorageAdapter {
 /**
  * 저장소 어댑터 팩토리
  */
-export function getStorageAdapter(): LocalStorageAdapter | SupabaseAdapter {
+export function getStorageAdapter(): LocalStorageAdapter | SupabaseAdapter | any {
   const mode = process.env.NEXT_PUBLIC_STORAGE_MODE as StorageMode || 'localStorage';
   
   // Vercel 환경에서는 메모리 모드 사용
   if (typeof window === 'undefined') {
-    console.log('[Storage Adapter] 서버 환경 - 메모리 모드 사용');
-    // 서버 환경에서는 메모리 어댑터를 LocalStorage 어댑터로 래핑
-    return new LocalStorageAdapter();
+    console.log('[Storage Adapter] 서버 환경 - 메모리 어댑터 사용');
+    // 서버 환경에서는 메모리 어댑터 사용
+    const { MemoryStorageAdapter } = require('./memory-storage-adapter');
+    return new MemoryStorageAdapter();
   }
   
   if (mode === 'supabase') {
