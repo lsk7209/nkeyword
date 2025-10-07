@@ -1,85 +1,50 @@
 /**
- * Supabase 클라이언트 (임시 비활성화)
- * Vercel 빌드 오류 해결을 위해 더미 클라이언트로 대체
+ * Supabase 클라이언트
+ * Vercel 환경에서 영구 저장소로 사용
  */
 
-// Supabase 설정 여부 확인
-export const isSupabaseConfigured = false;
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from './types';
 
-// 브라우저용 클라이언트 (더미)
-export const supabase: any = {
-  from: () => ({
-    select: () => ({
-      limit: () => ({
-        data: [],
-        error: null
-      })
-    }),
-    insert: () => ({
-      select: () => ({
-        single: () => ({
-          data: null,
-          error: null
-        })
-      })
-    }),
-    update: () => ({
-      eq: () => ({
-        select: () => ({
-          single: () => ({
-            data: null,
-            error: null
-          })
-        })
-      })
-    }),
-    delete: () => ({
-      eq: () => ({
-        data: null,
-        error: null
-      })
+// Supabase 설정
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Supabase 설정 확인
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey && supabaseServiceRoleKey);
+
+// Supabase 클라이언트 생성
+export const supabase: SupabaseClient<Database> = isSupabaseConfigured 
+  ? createClient<Database>(supabaseUrl!, supabaseAnonKey!)
+  : {} as SupabaseClient<Database>;
+
+export const supabaseAdmin: SupabaseClient<Database> = isSupabaseConfigured
+  ? createClient<Database>(supabaseUrl!, supabaseServiceRoleKey!, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
     })
-  })
-};
+  : {} as SupabaseClient<Database>;
 
-// 서버 사이드용 클라이언트 (더미)
-export const supabaseAdmin: any = {
-  from: () => ({
-    select: () => ({
-      limit: () => ({
-        data: [],
-        error: null
-      })
-    }),
-    insert: () => ({
-      select: () => ({
-        single: () => ({
-          data: null,
-          error: null
-        })
-      })
-    }),
-    update: () => ({
-      eq: () => ({
-        select: () => ({
-          single: () => ({
-            data: null,
-            error: null
-          })
-        })
-      })
-    }),
-    delete: () => ({
-      eq: () => ({
-        data: null,
-        error: null
-      })
-    })
-  })
-};
-
-// 연결 테스트 (더미)
+// 연결 테스트
 export async function testConnection() {
-  console.log('[Supabase] 연결 테스트 (더미)');
-  return false;
+  if (!isSupabaseConfigured) {
+    console.warn('[Supabase] 연결 테스트 건너김: 환경 변수가 설정되지 않았습니다.');
+    return false;
+  }
+
+  try {
+    const { data, error } = await supabase.from('keywords').select('count').limit(1);
+    if (error) {
+      console.error('[Supabase] 연결 테스트 실패:', error);
+      return false;
+    }
+    console.log('[Supabase] 연결 테스트 성공');
+    return true;
+  } catch (error) {
+    console.error('[Supabase] 연결 테스트 오류:', error);
+    return false;
+  }
 }

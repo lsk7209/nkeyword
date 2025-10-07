@@ -22,51 +22,169 @@ export interface DocumentCounts {
 }
 
 /**
- * Supabase 어댑터 (더미 클래스)
+ * Supabase 어댑터 (실제 구현)
  */
 export class SupabaseAdapter {
   async getKeywords(): Promise<Dataset> {
-    console.log('[Supabase Adapter] 키워드 조회 (더미)');
-    return [];
+    console.log('[Supabase Adapter] 키워드 조회');
+    const { supabase } = await import('./supabase/client');
+    const { data, error } = await supabase.from('keywords').select('*').order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('[Supabase Adapter] 키워드 조회 오류:', error);
+      return [];
+    }
+    
+    console.log(`[Supabase Adapter] ${data?.length || 0}개 키워드 조회됨`);
+    return data || [];
   }
 
   async addKeywords(results: any[]): Promise<void> {
-    console.log('[Supabase Adapter] 키워드 추가 (더미):', results.length);
+    console.log(`[Supabase Adapter] ${results.length}개 키워드 추가`);
+    const { supabaseAdmin } = await import('./supabase/client');
+    
+    const keywords = results.map(result => ({
+      keyword: result.keyword,
+      monthly_pc_search: result.monthlyPcSearch,
+      monthly_mobile_search: result.monthlyMobileSearch,
+      total_search: result.totalSearch,
+      competition: result.competition,
+      monthly_pc_clicks: result.monthlyPcClicks,
+      monthly_mobile_clicks: result.monthlyMobileClicks,
+      monthly_pc_click_rate: result.monthlyPcClickRate,
+      monthly_mobile_click_rate: result.monthlyMobileClickRate,
+      monthly_ad_count: result.monthlyAdCount,
+      blog_total_count: result.blogTotalCount,
+      cafe_total_count: result.cafeTotalCount,
+      news_total_count: result.newsTotalCount,
+      webkr_total_count: result.webkrTotalCount,
+    }));
+
+    const { error } = await supabaseAdmin.from('keywords').upsert(keywords, { onConflict: 'keyword' });
+    
+    if (error) {
+      console.error('[Supabase Adapter] 키워드 추가 오류:', error);
+      throw error;
+    }
+    
+    console.log(`[Supabase Adapter] ${results.length}개 키워드 추가 완료`);
   }
 
   async updateDocumentCounts(keyword: string, counts: DocumentCounts): Promise<void> {
-    console.log('[Supabase Adapter] 문서수 업데이트 (더미):', keyword, counts);
+    console.log(`[Supabase Adapter] ${keyword} 문서수 업데이트`, counts);
+    const { supabaseAdmin } = await import('./supabase/client');
+    
+    const { error } = await supabaseAdmin.from('keywords')
+      .update({
+        blog_total_count: counts.blog,
+        cafe_total_count: counts.cafe,
+        news_total_count: counts.news,
+        webkr_total_count: counts.webkr,
+      })
+      .eq('keyword', keyword);
+    
+    if (error) {
+      console.error('[Supabase Adapter] 문서수 업데이트 오류:', error);
+      throw error;
+    }
   }
 
   async deleteKeywords(keywords: string[]): Promise<void> {
-    console.log('[Supabase Adapter] 키워드 삭제 (더미):', keywords.length);
+    console.log(`[Supabase Adapter] ${keywords.length}개 키워드 삭제`);
+    const { supabaseAdmin } = await import('./supabase/client');
+    
+    const { error } = await supabaseAdmin.from('keywords')
+      .delete()
+      .in('keyword', keywords);
+    
+    if (error) {
+      console.error('[Supabase Adapter] 키워드 삭제 오류:', error);
+      throw error;
+    }
   }
 
   async clearAllKeywords(): Promise<void> {
-    console.log('[Supabase Adapter] 모든 키워드 삭제 (더미)');
+    console.log('[Supabase Adapter] 모든 키워드 삭제');
+    const { supabaseAdmin } = await import('./supabase/client');
+    
+    const { error } = await supabaseAdmin.from('keywords').delete().neq('id', '');
+    
+    if (error) {
+      console.error('[Supabase Adapter] 모든 키워드 삭제 오류:', error);
+      throw error;
+    }
   }
 
   async getKeywordsWithoutDocCounts(): Promise<string[]> {
-    console.log('[Supabase Adapter] 문서수 없는 키워드 조회 (더미)');
-    return [];
+    console.log('[Supabase Adapter] 문서수 없는 키워드 조회');
+    const { supabase } = await import('./supabase/client');
+    
+    const { data, error } = await supabase.from('keywords')
+      .select('keyword')
+      .or('blog_total_count.is.null,cafe_total_count.is.null,news_total_count.is.null,webkr_total_count.is.null');
+    
+    if (error) {
+      console.error('[Supabase Adapter] 문서수 없는 키워드 조회 오류:', error);
+      return [];
+    }
+    
+    return data?.map(row => row.keyword) || [];
   }
 
-  async getUnusedSeedKeywords(): Promise<string[]> {
-    console.log('[Supabase Adapter] 미사용 시드 키워드 조회 (더미)');
-    return [];
+  async getUnusedSeedKeywords(limit: number = 10): Promise<any[]> {
+    console.log('[Supabase Adapter] 미사용 시드 키워드 조회');
+    const { supabase } = await import('./supabase/client');
+    
+    const { data, error } = await supabase.from('keywords')
+      .select('*')
+      .is('root_keyword', null)
+      .limit(limit);
+    
+    if (error) {
+      console.error('[Supabase Adapter] 미사용 시드 키워드 조회 오류:', error);
+      return [];
+    }
+    
+    return data || [];
   }
 
-  async markAsUsedSeed(keywords: string[]): Promise<void> {
-    console.log('[Supabase Adapter] 시드 키워드 사용 표시 (더미):', keywords.length);
+  async markAsUsedSeed(keyword: string): Promise<void> {
+    console.log(`[Supabase Adapter] ${keyword} 시드 사용으로 표시`);
+    const { supabaseAdmin } = await import('./supabase/client');
+    
+    const { error } = await supabaseAdmin.from('keywords')
+      .update({ root_keyword: keyword })
+      .eq('keyword', keyword);
+    
+    if (error) {
+      console.error('[Supabase Adapter] 시드 사용 표시 오류:', error);
+      throw error;
+    }
   }
 
   async getKeywordStats(): Promise<{ total: number; withDocCounts: number; withoutDocCounts: number }> {
-    console.log('[Supabase Adapter] 키워드 통계 조회 (더미)');
-    return { total: 0, withDocCounts: 0, withoutDocCounts: 0 };
+    console.log('[Supabase Adapter] 키워드 통계 조회');
+    const { supabase } = await import('./supabase/client');
+    
+    const { data, error } = await supabase.from('keywords').select('*');
+    
+    if (error) {
+      console.error('[Supabase Adapter] 키워드 통계 조회 오류:', error);
+      return { total: 0, withDocCounts: 0, withoutDocCounts: 0 };
+    }
+    
+    const total = data?.length || 0;
+    const withDocCounts = data?.filter(item => 
+      item.blog_total_count || item.cafe_total_count || item.news_total_count || item.webkr_total_count
+    ).length || 0;
+    const withoutDocCounts = total - withDocCounts;
+    
+    return { total, withDocCounts, withoutDocCounts };
   }
 
   async batchInsertKeywords(keywords: any[]): Promise<void> {
-    console.log('[Supabase Adapter] 배치 키워드 삽입 (더미):', keywords.length);
+    console.log(`[Supabase Adapter] ${keywords.length}개 키워드 배치 삽입`);
+    await this.addKeywords(keywords);
   }
 }
 
@@ -168,23 +286,26 @@ export class LocalStorageAdapter {
  * 저장소 어댑터 팩토리
  */
 export function getStorageAdapter(): LocalStorageAdapter | SupabaseAdapter | any {
-  const mode = process.env.NEXT_PUBLIC_STORAGE_MODE as StorageMode || 'localStorage';
+  const mode = process.env.NEXT_PUBLIC_STORAGE_MODE as StorageMode || 'supabase';
   
-  // Vercel 환경에서는 메모리 모드 사용
+  // Supabase가 설정되어 있으면 Supabase 사용
+  const { isSupabaseConfigured } = require('./supabase/client');
+  
+  if (isSupabaseConfigured) {
+    console.log('[Storage Adapter] Supabase 모드 사용 (실제 DB)');
+    return new SupabaseAdapter();
+  }
+  
+  // 서버 환경에서 Supabase가 없으면 메모리 어댑터 사용
   if (typeof window === 'undefined') {
-    console.log('[Storage Adapter] 서버 환경 - 메모리 어댑터 사용');
-    // 서버 환경에서는 메모리 어댑터 사용
+    console.log('[Storage Adapter] 서버 환경 - 메모리 어댑터 사용 (Supabase 미설정)');
     const { MemoryStorageAdapter } = require('./memory-storage-adapter');
     return new MemoryStorageAdapter();
   }
   
-  if (mode === 'supabase') {
-    console.log('[Storage Adapter] Supabase 모드 사용 (더미)');
-    return new SupabaseAdapter();
-  } else {
-    console.log('[Storage Adapter] LocalStorage 모드 사용');
-    return new LocalStorageAdapter();
-  }
+  // 클라이언트 환경에서는 LocalStorage 사용
+  console.log('[Storage Adapter] LocalStorage 모드 사용 (Supabase 미설정)');
+  return new LocalStorageAdapter();
 }
 
 /**

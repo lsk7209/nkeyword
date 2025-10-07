@@ -6,7 +6,23 @@
 # ========================================
 # 데이터베이스 설정
 # ========================================
+# PostgreSQL 데이터베이스 (로컬 개발용)
 DATABASE_URL="postgresql://user:password@localhost:5432/trending_db"
+
+# ========================================
+# Supabase 설정 (Vercel 배포용 - 권장!)
+# ========================================
+# Supabase 프로젝트 URL
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+
+# Supabase Anon Key (공개 키)
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your_supabase_anon_key"
+
+# Supabase Service Role Key (서버 전용 - 비공개)
+SUPABASE_SERVICE_ROLE_KEY="your_supabase_service_role_key"
+
+# 저장소 모드 선택 (supabase 권장)
+NEXT_PUBLIC_STORAGE_MODE="supabase"
 
 # ========================================
 # 외부 API 키
