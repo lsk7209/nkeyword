@@ -1053,6 +1053,26 @@ export default function DataPage() {
     }
   }, [isMigrating]);
 
+  // 🔗 Supabase 연결 테스트 함수
+  const handleTestConnection = useCallback(async () => {
+    try {
+      console.log('[연결 테스트] 시작');
+      const response = await fetch('/api/test-connection');
+      const result = await response.json();
+      
+      console.log('[연결 테스트] 응답:', result);
+      
+      if (result.success) {
+        alert(`✅ Supabase 연결 성공!\n\n${result.message}`);
+      } else {
+        alert(`❌ Supabase 연결 실패: ${result.error}\n\n환경 변수 확인: ${JSON.stringify(result.envCheck, null, 2)}`);
+      }
+    } catch (error) {
+      console.error('[연결 테스트] 오류:', error);
+      alert('❌ 연결 테스트 중 오류가 발생했습니다.');
+    }
+  }, []);
+
   // 🔄 데이터 새로고침 함수
   const handleRefreshData = useCallback(async () => {
     try {
@@ -1649,6 +1669,12 @@ export default function DataPage() {
               선택 삭제 ({selectedKeywords.size}개)
             </button>
           )}
+          <button 
+            onClick={handleTestConnection}
+            className="rounded-md border bg-orange-500 text-white px-3 py-2 text-sm shadow-sm hover:bg-orange-600"
+          >
+            🔗 연결 테스트
+          </button>
           <button 
             onClick={handleRefreshData}
             className="rounded-md border bg-purple-500 text-white px-3 py-2 text-sm shadow-sm hover:bg-purple-600"
