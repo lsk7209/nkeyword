@@ -10,7 +10,7 @@ import type { Database } from './supabase/types';
 // 저장소 모드
 export type StorageMode = 'localStorage' | 'supabase';
 
-// StorageAdapter 인터페이스
+// StorageAdapter 인터페이스 (Vercel 배포용)
 export interface StorageAdapter {
   getKeywords(): Promise<Dataset>;
   addKeywords(results: any[]): Promise<void>;
