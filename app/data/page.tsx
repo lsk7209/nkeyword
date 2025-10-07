@@ -1019,8 +1019,21 @@ export default function DataPage() {
       
       if (result.success) {
         alert(`✅ 마이그레이션 완료!\n\n${result.imported}개 키워드가 성공적으로 가져와졌습니다.`);
-        // 데이터 새로고침
-        setDataset(loadDataset());
+        // 데이터 새로고침 - API를 통해 최신 데이터 로드
+        try {
+          const refreshResponse = await fetch('/api/data');
+          const refreshResult = await refreshResponse.json();
+          if (refreshResult.success) {
+            setDataset(refreshResult.data);
+            console.log(`[마이그레이션] 새로고침 완료: ${refreshResult.data.length}개 키워드`);
+          }
+        } catch (error) {
+          console.error('[마이그레이션] 새로고침 오류:', error);
+          // API 실패 시 LocalStorage 폴백
+          if (typeof window !== 'undefined') {
+            setDataset(loadDataset());
+          }
+        }
       } else {
         alert(`❌ 마이그레이션 실패: ${result.error}`);
       }
@@ -1032,6 +1045,25 @@ export default function DataPage() {
       setIsMigrating(false);
     }
   }, [isMigrating]);
+
+  // 🔄 데이터 새로고침 함수
+  const handleRefreshData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/data');
+      const result = await response.json();
+      
+      if (result.success) {
+        setDataset(result.data);
+        console.log(`[데이터 새로고침] ${result.data.length}개 키워드 로드됨`);
+        alert(`✅ 데이터 새로고침 완료!\n\n${result.data.length}개 키워드가 표시됩니다.`);
+      } else {
+        alert(`❌ 데이터 새로고침 실패: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('[데이터 새로고침] 오류:', error);
+      alert('❌ 데이터 새로고침 중 오류가 발생했습니다.');
+    }
+  }, []);
 
   // 🧪 테스트 데이터 생성 함수
   const handleCreateTestData = useCallback(async () => {
@@ -1054,8 +1086,21 @@ export default function DataPage() {
       
       if (result.success) {
         alert(`✅ 테스트 데이터 생성 완료!\n\n${result.message}`);
-        // 데이터 새로고침
-        setDataset(loadDataset());
+        // 데이터 새로고침 - API를 통해 최신 데이터 로드
+        try {
+          const refreshResponse = await fetch('/api/data');
+          const refreshResult = await refreshResponse.json();
+          if (refreshResult.success) {
+            setDataset(refreshResult.data);
+            console.log(`[테스트 데이터] 새로고침 완료: ${refreshResult.data.length}개 키워드`);
+          }
+        } catch (error) {
+          console.error('[테스트 데이터] 새로고침 오류:', error);
+          // API 실패 시 LocalStorage 폴백
+          if (typeof window !== 'undefined') {
+            setDataset(loadDataset());
+          }
+        }
       } else {
         alert(`❌ 테스트 데이터 생성 실패: ${result.error}`);
       }
@@ -1580,6 +1625,12 @@ export default function DataPage() {
               선택 삭제 ({selectedKeywords.size}개)
             </button>
           )}
+          <button 
+            onClick={handleRefreshData}
+            className="rounded-md border bg-purple-500 text-white px-3 py-2 text-sm shadow-sm hover:bg-purple-600"
+          >
+            🔄 데이터 새로고침
+          </button>
           <button 
             onClick={handleCreateTestData} 
             disabled={isMigrating}
