@@ -54,7 +54,7 @@ export async function collectTrendingKeywordsJob(): Promise<CollectionResult> {
       success: true,
       count: keywords.length,
       duration,
-      newKeywords: keywords.filter(k => k.isNew).length,
+      newKeywords: keywords.filter((k: any) => k.isNew).length,
       timestamp: new Date().toISOString(),
     };
     

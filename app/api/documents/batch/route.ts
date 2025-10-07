@@ -35,7 +35,9 @@ function setCachedDocumentCount(keyword: string, counts: DocumentCounts) {
   // 캐시 크기 제한 (최대 2000개) - 🚀 1000개 → 2000개로 변경
   if (documentCountCache.size > 2000) {
     const firstKey = documentCountCache.keys().next().value;
-    documentCountCache.delete(firstKey);
+    if (firstKey) {
+      documentCountCache.delete(firstKey);
+    }
   }
 }
 

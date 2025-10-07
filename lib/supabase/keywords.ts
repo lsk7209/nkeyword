@@ -110,7 +110,7 @@ export async function getKeywords(
 
   return {
     data: data || [],
-    nextCursor: data && data.length > 0 ? data[data.length - 1].id : undefined,
+    nextCursor: data && data.length > 0 ? (data[data.length - 1] as any).id : undefined,
     total: count || 0,
   };
 }
@@ -121,7 +121,7 @@ export async function getKeywords(
 export async function upsertKeywords(keywords: Partial<KeywordData>[]) {
   const { data, error } = await supabaseAdmin
     .from('keywords')
-    .upsert(keywords, {
+    .upsert(keywords as any, {
       onConflict: 'keyword',
       ignoreDuplicates: false,
     });
@@ -183,7 +183,7 @@ export async function updateDocumentCounts(
       cafe_total_count: counts.cafe,
       news_total_count: counts.news,
       webkr_total_count: counts.webkr,
-    })
+    } as any)
     .eq('keyword', keyword);
 
   if (error) {
@@ -207,7 +207,7 @@ export async function getKeywordsWithoutDocCounts(limit = 100): Promise<string[]
     throw error;
   }
 
-  return data?.map(row => row.keyword) || [];
+  return data?.map((row: any) => row.keyword) || [];
 }
 
 /**

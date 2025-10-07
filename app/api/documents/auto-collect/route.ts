@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     
     // 2. 배치 작업 생성
     const batchJobId = `auto-${Date.now()}`;
-    const keywordList = keywords.map(k => k.keyword);
+    const keywordList = keywords.map((k: any) => k.keyword);
     
     // 3. 배치 API 호출
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';

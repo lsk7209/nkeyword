@@ -1,7 +1,6 @@
 // 네이버 실시간 검색어 수집 서비스 (완전 무료, API 키 불필요)
 
 import axios from 'axios';
-import * as cheerio from 'cheerio';
 import type { TrendingKeyword } from '@/lib/types/trending';
 import { logger } from '@/lib/utils/logger';
 import {
@@ -72,26 +71,31 @@ export class NaverTrendCollector {
         timeout: 15000,
       });
 
-      const $ = cheerio.load(response.data);
       const keywords: TrendingKeyword[] = [];
 
-      // DataLab 페이지 파싱
-      $('.keyword_rank li').each((index, element) => {
-        const rank = index + 1;
-        const keyword = $(element).find('.item_title').text().trim();
-        const changeText = $(element).find('.item_change').text().trim();
+      // DataLab 페이지 파싱 (정규식 사용)
+      const listItems = response.data.match(/<li[^>]*class="[^"]*keyword_rank[^"]*"[^>]*>[\s\S]*?<\/li>/g);
+      if (listItems) {
+        listItems.forEach((item: string, index: number) => {
+          const rank = index + 1;
+          const keywordMatch = item.match(/<span[^>]*class="[^"]*item_title[^"]*"[^>]*>([^<]+)<\/span>/);
+          const changeMatch = item.match(/<span[^>]*class="[^"]*item_change[^"]*"[^>]*>([^<]+)<\/span>/);
+          
+          const keyword = keywordMatch ? keywordMatch[1].trim() : '';
+          const changeText = changeMatch ? changeMatch[1].trim() : '';
 
-        if (keyword) {
-          keywords.push({
-            keyword,
-            rank,
-            searchVolume: 0, // DataLab은 검색량 제공 안 함
-            changeRate: this.parseChangeRate(changeText),
-            category: this.detectCategory(keyword),
-            isNew: false, // 나중에 계산
-          });
-        }
-      });
+          if (keyword) {
+            keywords.push({
+              keyword,
+              rank,
+              searchVolume: 0, // DataLab은 검색량 제공 안 함
+              changeRate: this.parseChangeRate(changeText),
+              category: this.detectCategory(keyword),
+              isNew: false, // 나중에 계산
+            });
+          }
+        });
+      }
 
       logger.debug('[NaverTrendCollector] DataLab parsed', { count: keywords.length });
 

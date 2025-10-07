@@ -36,13 +36,29 @@ export interface ApiResponse {
   details?: string;
 }
 
-export type SortField = 'keyword' | 'totalSearch' | 'competition';
-export type SortOrder = 'asc' | 'desc';
+// export type SortField = 'keyword' | 'totalSearch' | 'competition';
+// export type SortOrder = 'asc' | 'desc';
 
 export interface SearchFilters {
   minSearch?: number;
   maxSearch?: number;
   competition?: string[];
+}
+
+export interface Filters {
+  keyword: string;
+  minSearch: string;
+  maxSearch: string;
+  competition: string[];
+  hasDocCounts: boolean;
+  minBlogCount: string;
+  maxBlogCount: string;
+  minCafeCount: string;
+  maxCafeCount: string;
+  minNewsCount: string;
+  maxNewsCount: string;
+  minWebkrCount: string;
+  maxWebkrCount: string;
 }
 
 // Naver Search API types

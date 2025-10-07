@@ -107,7 +107,7 @@ export class TrendingService {
     logger.debug('[TrendingService] Getting history', { keyword, ...params });
 
     // 캐시 확인
-    const cacheKey = createCacheKey('history', keyword, startDate, endDate, interval);
+    const cacheKey = createCacheKey('history', keyword, startDate || '', endDate || '', interval);
     const cached = await cache.get<any>(cacheKey);
     
     if (cached) {
