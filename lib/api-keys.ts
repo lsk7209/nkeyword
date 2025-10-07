@@ -21,9 +21,20 @@ export const SEARCH_AD_KEYS: SearchAdKey[] = [
     customer_id: process.env.NAVER_CUSTOMER_ID_1 || "YOUR_CUSTOMER_ID",
     api_key: process.env.NAVER_API_KEY_1 || "YOUR_API_KEY",
     secret_key: process.env.NAVER_SECRET_KEY_1 || "YOUR_SECRET_KEY"
+  },
+  {
+    name: "검색광고API키2",
+    customer_id: process.env.NAVER_CUSTOMER_ID_2 || "YOUR_CUSTOMER_ID",
+    api_key: process.env.NAVER_API_KEY_2 || "YOUR_API_KEY",
+    secret_key: process.env.NAVER_SECRET_KEY_2 || "YOUR_SECRET_KEY"
+  },
+  {
+    name: "검색광고API키3",
+    customer_id: process.env.NAVER_CUSTOMER_ID_3 || "YOUR_CUSTOMER_ID",
+    api_key: process.env.NAVER_API_KEY_3 || "YOUR_API_KEY",
+    secret_key: process.env.NAVER_SECRET_KEY_3 || "YOUR_SECRET_KEY"
   }
-  // 추가 키를 여기에 입력하세요
-];
+].filter(key => key.customer_id !== "YOUR_CUSTOMER_ID"); // 실제 키가 있는 것만 필터링
 
 // 오픈 API 키 목록 (검색 API용)
 export const OPEN_API_KEYS: OpenApiKey[] = [
@@ -31,9 +42,18 @@ export const OPEN_API_KEYS: OpenApiKey[] = [
     name: "OpenAPI키1",
     client_id: process.env.NAVER_SEARCH_CLIENT_ID_1 || "YOUR_CLIENT_ID",
     client_secret: process.env.NAVER_SEARCH_CLIENT_SECRET_1 || "YOUR_CLIENT_SECRET"
+  },
+  {
+    name: "OpenAPI키2",
+    client_id: process.env.NAVER_SEARCH_CLIENT_ID_2 || "YOUR_CLIENT_ID",
+    client_secret: process.env.NAVER_SEARCH_CLIENT_SECRET_2 || "YOUR_CLIENT_SECRET"
+  },
+  {
+    name: "OpenAPI키3",
+    client_id: process.env.NAVER_SEARCH_CLIENT_ID_3 || "YOUR_CLIENT_ID",
+    client_secret: process.env.NAVER_SEARCH_CLIENT_SECRET_3 || "YOUR_CLIENT_SECRET"
   }
-  // 추가 키를 여기에 입력하세요
-];
+].filter(key => key.client_id !== "YOUR_CLIENT_ID"); // 실제 키가 있는 것만 필터링
 
 // 키 로테이션 인덱스 (서버 메모리에 저장)
 let searchAdKeyIndex = 0;
