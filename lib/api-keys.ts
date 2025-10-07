@@ -17,11 +17,20 @@ export interface OpenApiKey {
 // 검색광고 API 키 목록 (Vercel 환경 변수에서 로드) - 최대 20개 지원
 export const SEARCH_AD_KEYS: SearchAdKey[] = Array.from({ length: 20 }, (_, i) => {
   const index = i + 1;
+  const customerId = process.env[`NAVER_CUSTOMER_ID_${index}`];
+  const apiKey = process.env[`NAVER_API_KEY_${index}`];
+  const secretKey = process.env[`NAVER_SECRET_KEY_${index}`];
+  
+  // 디버깅: 환경 변수 로딩 상태 확인
+  if (customerId && customerId !== "YOUR_CUSTOMER_ID") {
+    console.log(`[API Keys] 검색광고 API 키 ${index} 로드됨: ${customerId.substring(0, 8)}...`);
+  }
+  
   return {
     name: `검색광고API키${index}`,
-    customer_id: process.env[`NAVER_CUSTOMER_ID_${index}`] || "YOUR_CUSTOMER_ID",
-    api_key: process.env[`NAVER_API_KEY_${index}`] || "YOUR_API_KEY",
-    secret_key: process.env[`NAVER_SECRET_KEY_${index}`] || "YOUR_SECRET_KEY"
+    customer_id: customerId || "YOUR_CUSTOMER_ID",
+    api_key: apiKey || "YOUR_API_KEY",
+    secret_key: secretKey || "YOUR_SECRET_KEY"
   };
 }).filter(key => key.customer_id !== "YOUR_CUSTOMER_ID"); // 실제 키가 있는 것만 필터링
 
@@ -97,8 +106,14 @@ export function getOpenApiKeyByIndex(index: number): OpenApiKey | null {
  * API 키 개수 반환
  */
 export function getKeyCount() {
-  return {
+  const counts = {
     searchAdKeys: SEARCH_AD_KEYS.length,
     openApiKeys: OPEN_API_KEYS.length
   };
+  
+  console.log('[API Keys] 키 개수:', counts);
+  console.log('[API Keys] 검색광고 키들:', SEARCH_AD_KEYS.map(k => k.name));
+  console.log('[API Keys] 오픈 API 키들:', OPEN_API_KEYS.map(k => k.name));
+  
+  return counts;
 }

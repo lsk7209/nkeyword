@@ -38,12 +38,15 @@ export async function POST(request: NextRequest) {
       
       try {
         const apiKey = getNextSearchAdKey();
+        console.log(`[자동 수집] API 키 사용: ${apiKey.name} (${apiKey.customer_id.substring(0, 8)}...)`);
+        
         const params = new URLSearchParams({
           hintKeywords: seedKeyword,
           showDetail: '1',
         });
         
         const headers = createHeaders(method, uri, apiKey);
+        console.log(`[자동 수집] 요청 URL: https://api.naver.com${uri}?${params}`);
 
         const response = await fetch(
           `https://api.naver.com${uri}?${params}`,
