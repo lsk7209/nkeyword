@@ -7,12 +7,22 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 // Supabase 설정
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_nkeywordSUPABASE_URL;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_nkeywordSUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_nkeywordSUPABASE_ANON_KEY;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Supabase 설정 확인
 export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey && supabaseServiceRoleKey);
+
+// 디버깅 로그
+console.log('[Supabase] 환경 변수 확인:', {
+  supabaseUrl: !!supabaseUrl,
+  supabaseAnonKey: !!supabaseAnonKey,
+  supabaseServiceRoleKey: !!supabaseServiceRoleKey,
+  isConfigured: isSupabaseConfigured,
+  urlValue: supabaseUrl?.substring(0, 30) + '...',
+  anonKeyValue: supabaseAnonKey?.substring(0, 30) + '...'
+});
 
 // Supabase 클라이언트 생성
 export const supabase: SupabaseClient<Database> = isSupabaseConfigured 
