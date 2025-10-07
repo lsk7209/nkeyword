@@ -286,7 +286,7 @@ export class LocalStorageAdapter {
  * 저장소 어댑터 팩토리
  */
 export function getStorageAdapter(): LocalStorageAdapter | SupabaseAdapter | any {
-  const mode = process.env.NEXT_PUBLIC_STORAGE_MODE as StorageMode || 'supabase';
+  const mode = (process.env.NEXT_PUBLIC_STORAGE_MODE || process.env.STORAGE_MODE) as StorageMode || 'supabase';
   
   // Supabase가 설정되어 있으면 Supabase 사용
   const { isSupabaseConfigured } = require('./supabase/client');
