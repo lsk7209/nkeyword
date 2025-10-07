@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
       setMemoryStorage(testData);
       
       console.log(`[테스트 데이터] 메모리 저장소에 ${testData.length}개 키워드 저장 완료`);
+      console.log('[테스트 데이터] 저장된 데이터:', testData);
       
       return NextResponse.json({
         success: true,

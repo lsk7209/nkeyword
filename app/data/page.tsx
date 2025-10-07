@@ -183,23 +183,32 @@ export default function DataPage() {
         
         console.log('[성능] 데이터 로딩 시작');
         
-        // 🚀 서버 환경에서는 API로 데이터 로드
+        // 🚀 모든 환경에서 API로 데이터 로드 (Vercel 호환성)
         let data: Dataset = [];
         
-        if (typeof window === 'undefined') {
-          // 서버 환경에서는 API 호출
-          try {
-            const response = await fetch('/api/data');
-            const result = await response.json();
-            if (result.success) {
-              data = result.data;
+        try {
+          const response = await fetch('/api/data');
+          const result = await response.json();
+          console.log('[데이터 로드] API 응답:', result);
+          
+          if (result.success) {
+            data = result.data;
+            console.log(`[데이터 로드] API에서 ${data.length}개 키워드 로드됨`);
+          } else {
+            console.error('[데이터 로드] API 오류:', result.error);
+            // API 실패 시 LocalStorage 폴백 (클라이언트 환경에서만)
+            if (typeof window !== 'undefined') {
+              data = loadDataset();
+              console.log(`[데이터 로드] LocalStorage 폴백: ${data.length}개 키워드`);
             }
-          } catch (error) {
-            console.error('[서버 데이터 로드] 오류:', error);
           }
-        } else {
-          // 클라이언트 환경에서는 LocalStorage 사용
-          data = loadDataset();
+        } catch (error) {
+          console.error('[데이터 로드] API 호출 오류:', error);
+          // API 실패 시 LocalStorage 폴백 (클라이언트 환경에서만)
+          if (typeof window !== 'undefined') {
+            data = loadDataset();
+            console.log(`[데이터 로드] LocalStorage 폴백: ${data.length}개 키워드`);
+          }
         }
         
         const loadTime = performance.now() - startTime;
