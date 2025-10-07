@@ -14,46 +14,26 @@ export interface OpenApiKey {
   client_secret: string;
 }
 
-// 검색광고 API 키 목록 (Vercel 환경 변수에서 로드)
-export const SEARCH_AD_KEYS: SearchAdKey[] = [
-  {
-    name: "검색광고API키1",
-    customer_id: process.env.NAVER_CUSTOMER_ID_1 || "YOUR_CUSTOMER_ID",
-    api_key: process.env.NAVER_API_KEY_1 || "YOUR_API_KEY",
-    secret_key: process.env.NAVER_SECRET_KEY_1 || "YOUR_SECRET_KEY"
-  },
-  {
-    name: "검색광고API키2",
-    customer_id: process.env.NAVER_CUSTOMER_ID_2 || "YOUR_CUSTOMER_ID",
-    api_key: process.env.NAVER_API_KEY_2 || "YOUR_API_KEY",
-    secret_key: process.env.NAVER_SECRET_KEY_2 || "YOUR_SECRET_KEY"
-  },
-  {
-    name: "검색광고API키3",
-    customer_id: process.env.NAVER_CUSTOMER_ID_3 || "YOUR_CUSTOMER_ID",
-    api_key: process.env.NAVER_API_KEY_3 || "YOUR_API_KEY",
-    secret_key: process.env.NAVER_SECRET_KEY_3 || "YOUR_SECRET_KEY"
-  }
-].filter(key => key.customer_id !== "YOUR_CUSTOMER_ID"); // 실제 키가 있는 것만 필터링
+// 검색광고 API 키 목록 (Vercel 환경 변수에서 로드) - 최대 20개 지원
+export const SEARCH_AD_KEYS: SearchAdKey[] = Array.from({ length: 20 }, (_, i) => {
+  const index = i + 1;
+  return {
+    name: `검색광고API키${index}`,
+    customer_id: process.env[`NAVER_CUSTOMER_ID_${index}`] || "YOUR_CUSTOMER_ID",
+    api_key: process.env[`NAVER_API_KEY_${index}`] || "YOUR_API_KEY",
+    secret_key: process.env[`NAVER_SECRET_KEY_${index}`] || "YOUR_SECRET_KEY"
+  };
+}).filter(key => key.customer_id !== "YOUR_CUSTOMER_ID"); // 실제 키가 있는 것만 필터링
 
-// 오픈 API 키 목록 (검색 API용)
-export const OPEN_API_KEYS: OpenApiKey[] = [
-  {
-    name: "OpenAPI키1",
-    client_id: process.env.NAVER_SEARCH_CLIENT_ID_1 || "YOUR_CLIENT_ID",
-    client_secret: process.env.NAVER_SEARCH_CLIENT_SECRET_1 || "YOUR_CLIENT_SECRET"
-  },
-  {
-    name: "OpenAPI키2",
-    client_id: process.env.NAVER_SEARCH_CLIENT_ID_2 || "YOUR_CLIENT_ID",
-    client_secret: process.env.NAVER_SEARCH_CLIENT_SECRET_2 || "YOUR_CLIENT_SECRET"
-  },
-  {
-    name: "OpenAPI키3",
-    client_id: process.env.NAVER_SEARCH_CLIENT_ID_3 || "YOUR_CLIENT_ID",
-    client_secret: process.env.NAVER_SEARCH_CLIENT_SECRET_3 || "YOUR_CLIENT_SECRET"
-  }
-].filter(key => key.client_id !== "YOUR_CLIENT_ID"); // 실제 키가 있는 것만 필터링
+// 오픈 API 키 목록 (검색 API용) - 최대 20개 지원
+export const OPEN_API_KEYS: OpenApiKey[] = Array.from({ length: 20 }, (_, i) => {
+  const index = i + 1;
+  return {
+    name: `OpenAPI키${index}`,
+    client_id: process.env[`NAVER_SEARCH_CLIENT_ID_${index}`] || "YOUR_CLIENT_ID",
+    client_secret: process.env[`NAVER_SEARCH_CLIENT_SECRET_${index}`] || "YOUR_CLIENT_SECRET"
+  };
+}).filter(key => key.client_id !== "YOUR_CLIENT_ID"); // 실제 키가 있는 것만 필터링
 
 // 키 로테이션 인덱스 (서버 메모리에 저장)
 let searchAdKeyIndex = 0;
