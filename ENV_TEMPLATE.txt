@@ -1,0 +1,44 @@
+# ========================================
+# 네이버 키워드 도구 + 트렌드 API
+# ========================================
+# 이 파일을 .env.local로 복사하여 사용하세요
+
+# ========================================
+# 데이터베이스 설정
+# ========================================
+DATABASE_URL="postgresql://user:password@localhost:5432/trending_db"
+
+# ========================================
+# 외부 API 키
+# ========================================
+# 트렌드 수집 방법 선택 (naver, google, serpapi)
+# naver: 네이버 실시간 검색어 (무료, 추천!)
+# google: Google Trends (무료, 비공식)
+# serpapi: SerpApi (유료, 안정적)
+TREND_COLLECTOR="naver"
+
+# Google Trends API (SerpApi 사용) - TREND_COLLECTOR=serpapi 일 때만 필요
+# https://serpapi.com/ 에서 발급
+# SERPAPI_KEY="your_serpapi_key_here"
+
+# 네이버 검색광고 API 키들
+NAVER_API_KEY_1="your_naver_key_1"
+NAVER_API_KEY_2="your_naver_key_2"
+NAVER_API_KEY_3="your_naver_key_3"
+
+# 네이버 검색 API 키들 (OpenAPI)
+NAVER_SEARCH_CLIENT_ID_1="your_client_id_1"
+NAVER_SEARCH_CLIENT_SECRET_1="your_client_secret_1"
+
+# ========================================
+# 스케줄러 설정
+# ========================================
+# CRON 작업 인증용 시크릿 (무작위 문자열 권장)
+CRON_SECRET="your_random_secret_string_here"
+
+# ========================================
+# 로깅 설정
+# ========================================
+# 로그 레벨: debug, info, warn, error
+LOG_LEVEL="info"
+

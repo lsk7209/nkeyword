@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+
+# Next.js
+.next
+out
+
+# Env
+.env.local
+.env.*.local
+
+# API Keys (보안)
+lib/api-keys.ts
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor
+.DS_Store
+.idea
+.vscode
+
+

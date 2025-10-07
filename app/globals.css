@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --container-max: 80rem;
+}
+
+.container {
+  max-width: var(--container-max);
+}
+
+

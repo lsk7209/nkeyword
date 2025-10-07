@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["icn1"],
+  "functions": {
+    "app/api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "app/api/documents/batch/route.ts": {
+      "memory": 2048,
+      "maxDuration": 300
+    },
+    "app/api/documents/auto-collect/route.ts": {
+      "memory": 2048,
+      "maxDuration": 300
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/documents/auto-collect",
+      "schedule": "0 1 * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=10, stale-while-revalidate=59"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
+}
+
