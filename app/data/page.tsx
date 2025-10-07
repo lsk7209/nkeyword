@@ -79,6 +79,7 @@ export default function DataPage() {
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [worker, setWorker] = useState<Worker | null>(null);
   const [storageInfo, setStorageInfo] = useState<{ used: number; total: number; percentage: number } | null>(null);
+  const [isMigrating, setIsMigrating] = useState(false);
   
   // 자동 수집 상태
   const [autoCollectConfig, setAutoCollectConfig] = useState<AutoCollectConfig>({
@@ -961,6 +962,86 @@ export default function DataPage() {
     }
   }, [worker]);
 
+  // 🔄 데이터 마이그레이션 함수
+  const handleDataMigration = useCallback(async () => {
+    if (isMigrating) return;
+    
+    try {
+      setIsMigrating(true);
+      
+      // 1. 현재 LocalStorage 데이터 내보내기
+      const currentData = loadDataset();
+      
+      if (currentData.length === 0) {
+        alert('마이그레이션할 데이터가 없습니다.');
+        return;
+      }
+      
+      // 2. 서버로 데이터 전송
+      const response = await fetch('/api/migrate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'import',
+          data: currentData
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`✅ 마이그레이션 완료!\n\n${result.imported}개 키워드가 성공적으로 가져와졌습니다.`);
+        // 데이터 새로고침
+        setDataset(loadDataset());
+      } else {
+        alert(`❌ 마이그레이션 실패: ${result.error}`);
+      }
+      
+    } catch (error) {
+      console.error('[마이그레이션] 오류:', error);
+      alert('❌ 마이그레이션 중 오류가 발생했습니다.');
+    } finally {
+      setIsMigrating(false);
+    }
+  }, [isMigrating]);
+
+  // 🧪 테스트 데이터 생성 함수
+  const handleCreateTestData = useCallback(async () => {
+    if (isMigrating) return;
+    
+    try {
+      setIsMigrating(true);
+      
+      const response = await fetch('/api/test-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create'
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`✅ 테스트 데이터 생성 완료!\n\n${result.message}`);
+        // 데이터 새로고침
+        setDataset(loadDataset());
+      } else {
+        alert(`❌ 테스트 데이터 생성 실패: ${result.error}`);
+      }
+      
+    } catch (error) {
+      console.error('[테스트 데이터] 오류:', error);
+      alert('❌ 테스트 데이터 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsMigrating(false);
+    }
+  }, [isMigrating]);
+
   const handleSelectAll = () => {
     if (selectedKeywords.size === currentPageData.length) {
       setSelectedKeywords(new Set());
@@ -1473,6 +1554,20 @@ export default function DataPage() {
               선택 삭제 ({selectedKeywords.size}개)
             </button>
           )}
+          <button 
+            onClick={handleCreateTestData} 
+            disabled={isMigrating}
+            className="rounded-md border bg-green-500 text-white px-3 py-2 text-sm shadow-sm hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isMigrating ? '🔄 생성 중...' : '🧪 테스트 데이터 생성'}
+          </button>
+          <button 
+            onClick={handleDataMigration} 
+            disabled={isMigrating}
+            className="rounded-md border bg-blue-500 text-white px-3 py-2 text-sm shadow-sm hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isMigrating ? '🔄 마이그레이션 중...' : '🔄 데이터 마이그레이션'}
+          </button>
           <button onClick={handleClear} className="rounded-md border bg-white px-3 py-2 text-sm shadow-sm hover:bg-gray-50">전체 삭제</button>
         </div>
       </div>
