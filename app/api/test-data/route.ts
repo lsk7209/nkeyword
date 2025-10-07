@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStorageAdapter } from '@/lib/storage-adapter';
 import { setMemoryStorage } from '@/lib/memory-storage';
+import type { KeywordData } from '@/lib/types';
 
 /**
  * 테스트 데이터 생성 API
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
     
     if (action === 'create') {
       // 테스트용 키워드 데이터 생성
-      const testData = [
+      const testData: KeywordData[] = [
         {
           keyword: '반려로봇',
           monthlyPcSearch: 12000,
@@ -67,7 +68,13 @@ export async function POST(request: NextRequest) {
       setMemoryStorage(testData);
       
       console.log(`[테스트 데이터] 메모리 저장소에 ${testData.length}개 키워드 저장 완료`);
-      console.log('[테스트 데이터] 저장된 데이터:', testData);
+      console.log('[테스트 데이터] 저장된 데이터:', JSON.stringify(testData, null, 2));
+      
+      // 저장 후 즉시 확인
+      const { getMemoryStorage } = await import('@/lib/memory-storage');
+      const storedData = getMemoryStorage();
+      console.log(`[테스트 데이터] 저장 확인: ${storedData.length}개 키워드`);
+      console.log('[테스트 데이터] 저장된 키워드들:', storedData.map(k => k.keyword));
       
       return NextResponse.json({
         success: true,

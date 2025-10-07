@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMemoryStorage } from '@/lib/memory-storage';
+import type { KeywordData } from '@/lib/types';
 
 /**
  * 데이터 조회 API
@@ -7,7 +8,7 @@ import { getMemoryStorage } from '@/lib/memory-storage';
  */
 export async function GET(request: NextRequest) {
   try {
-    const data = getMemoryStorage();
+    const data: KeywordData[] = getMemoryStorage();
     
     console.log(`[데이터 조회] 메모리 저장소에서 ${data.length}개 키워드 조회`);
     console.log('[데이터 조회] 조회된 데이터:', data);
