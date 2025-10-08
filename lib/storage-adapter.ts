@@ -62,7 +62,7 @@ export class SupabaseAdapter implements StorageAdapter {
     console.log(`[Supabase Adapter] ${results.length}개 키워드 추가`);
     const { supabaseAdmin, isSupabaseConfigured } = await import('./supabase/client');
     
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || !supabaseAdmin) {
       console.warn('[Supabase Adapter] Supabase가 설정되지 않음 - 키워드 추가 건너뜀');
       return;
     }
@@ -98,7 +98,7 @@ export class SupabaseAdapter implements StorageAdapter {
     console.log(`[Supabase Adapter] ${keyword} 문서수 업데이트`, counts);
     const { supabaseAdmin, isSupabaseConfigured } = await import('./supabase/client');
     
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || !supabaseAdmin) {
       console.warn('[Supabase Adapter] Supabase가 설정되지 않음 - 문서수 업데이트 건너뜀');
       return;
     }
@@ -181,7 +181,7 @@ export class SupabaseAdapter implements StorageAdapter {
     console.log(`[Supabase Adapter] ${keyword} 시드 사용으로 표시`);
     const { supabaseAdmin, isSupabaseConfigured } = await import('./supabase/client');
     
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || !supabaseAdmin) {
       console.warn('[Supabase Adapter] Supabase가 설정되지 않음 - 시드 사용 표시 건너뜀');
       return;
     }

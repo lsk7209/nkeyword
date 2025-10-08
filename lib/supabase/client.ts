@@ -27,7 +27,7 @@ console.log('[Supabase] 환경 변수 확인:', {
 // Supabase 클라이언트 생성
 export const supabase: SupabaseClient<Database> = isSupabaseConfigured 
   ? createClient<Database>(supabaseUrl!, supabaseAnonKey!)
-  : {} as SupabaseClient<Database>;
+  : null as any;
 
 export const supabaseAdmin: SupabaseClient<Database> = isSupabaseConfigured
   ? createClient<Database>(supabaseUrl!, supabaseServiceRoleKey!, {
@@ -36,7 +36,7 @@ export const supabaseAdmin: SupabaseClient<Database> = isSupabaseConfigured
         persistSession: false
       }
     })
-  : {} as SupabaseClient<Database>;
+  : null as any;
 
 // 연결 테스트
 export async function testConnection() {
