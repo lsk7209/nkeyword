@@ -61,6 +61,11 @@ export class SupabaseAdapter implements StorageAdapter {
     console.log(`[Supabase Adapter] ${keywords.length}개 키워드 삭제`);
     const { supabaseAdmin } = await import('./supabase/client');
     
+    if (!supabaseAdmin) {
+      console.warn('[Supabase Adapter] Supabase Admin 클라이언트가 null - 키워드 삭제 건너뜀');
+      return;
+    }
+    
     const { error } = await supabaseAdmin.from('keywords')
         .delete()
         .in('keyword', keywords);
@@ -74,6 +79,11 @@ export class SupabaseAdapter implements StorageAdapter {
   async clearAllKeywords(): Promise<void> {
     console.log('[Supabase Adapter] 모든 키워드 삭제');
     const { supabaseAdmin } = await import('./supabase/client');
+    
+    if (!supabaseAdmin) {
+      console.warn('[Supabase Adapter] Supabase Admin 클라이언트가 null - 모든 키워드 삭제 건너뜀');
+      return;
+    }
     
     const { error } = await supabaseAdmin.from('keywords').delete().neq('id', '');
     
