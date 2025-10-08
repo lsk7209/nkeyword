@@ -4,15 +4,16 @@
  */
 
 import type { KeywordData } from './types';
+import type { StoredRow, Dataset } from './storage';
 
 // 전역 메모리 저장소
-let memoryStorage: KeywordData[] = [];
+let memoryStorage: Dataset = [];
 
-export function getMemoryStorage(): KeywordData[] {
+export function getMemoryStorage(): Dataset {
   return memoryStorage;
 }
 
-export function setMemoryStorage(data: KeywordData[]): void {
+export function setMemoryStorage(data: Dataset): void {
   memoryStorage = data;
   console.log(`[Memory Storage] 데이터 저장: ${data.length}개 키워드`);
 }
@@ -24,8 +25,15 @@ export function addMemoryKeywords(keywords: KeywordData[]): void {
       // 기존 키워드가 있으면 업데이트
       memoryStorage[existingIndex] = { ...memoryStorage[existingIndex], ...newKeyword };
     } else {
-      // 없으면 추가
-      memoryStorage.push(newKeyword);
+      // 없으면 StoredRow로 변환하여 추가
+      const storedRow: StoredRow = {
+        ...newKeyword,
+        queriedAt: new Date().toISOString(),
+        rootKeyword: newKeyword.keyword,
+        usedAsSeed: false,
+        seedDepth: 0
+      };
+      memoryStorage.push(storedRow);
     }
   });
   console.log(`[Memory Storage] ${keywords.length}개 키워드 추가/업데이트`);
