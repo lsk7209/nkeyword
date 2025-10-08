@@ -58,7 +58,7 @@ export async function getKeywords(
     return { data: [], total: 0 };
   }
 
-  let query = supabase
+  let query = (supabase as any)
     .from('keywords')
     .select('*', { count: 'exact' });
 
@@ -158,7 +158,7 @@ export async function deleteKeywords(keywordIds: number[]) {
     return;
   }
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('keywords')
     .delete()
     .in('id', keywordIds);
@@ -238,7 +238,7 @@ export async function getKeywordsWithoutDocCounts(limit = 100): Promise<string[]
     return [];
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('keywords')
     .select('keyword')
     .is('cafe_total_count', null)
@@ -261,7 +261,7 @@ export async function getUnusedSeedKeywords(limit = 10) {
     return [];
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('keywords')
     .select('*')
     .eq('used_as_seed', false)
@@ -285,7 +285,7 @@ export async function markAsUsedSeed(keyword: string) {
     return;
   }
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('keywords')
     .update({ used_as_seed: true })
     .eq('keyword', keyword);
@@ -305,7 +305,7 @@ export async function getKeywordStats() {
     return null;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('keyword_performance_stats')
     .select('*')
     .single();
