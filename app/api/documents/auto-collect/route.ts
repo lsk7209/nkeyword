@@ -193,6 +193,14 @@ export async function GET(request: NextRequest) {
     // Supabase 모드인 경우 통계 조회
     const { supabase } = await import('@/lib/supabase/client');
     
+    if (!supabase) {
+      logger.error('[AUTO-COLLECT] Supabase 클라이언트가 null입니다.');
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Supabase 클라이언트가 설정되지 않았습니다.' 
+      }, { status: 500 });
+    }
+    
     const { count: totalKeywords } = await supabase
       .from('keywords')
       .select('*', { count: 'exact', head: true });
