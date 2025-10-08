@@ -45,6 +45,11 @@ export async function testConnection() {
     return false;
   }
 
+  if (!supabase) {
+    console.warn('[Supabase] 연결 테스트 건너김: Supabase 클라이언트가 null입니다.');
+    return false;
+  }
+
   try {
     const { data, error } = await supabase.from('keywords').select('count').limit(1);
     if (error) {
