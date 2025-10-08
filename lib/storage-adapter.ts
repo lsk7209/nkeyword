@@ -205,18 +205,25 @@ export class LocalStorageAdapter implements StorageAdapter {
  * 저장소 어댑터 팩토리
  */
 export function getStorageAdapter(): LocalStorageAdapter | SupabaseAdapter | any {
-  // Vercel 빌드 오류 방지를 위해 Supabase 어댑터 비활성화
-  console.log('[Storage Adapter] Supabase 어댑터 비활성화 - 메모리 어댑터 사용');
+  const mode = (process.env.NEXT_PUBLIC_STORAGE_MODE || process.env.STORAGE_MODE) as StorageMode || 'supabase';
   
-  // 서버 환경에서는 메모리 어댑터 사용
+  // Supabase가 설정되어 있으면 Supabase 사용
+  const { isSupabaseConfigured } = require('./supabase/client');
+  
+  if (isSupabaseConfigured) {
+    console.log('[Storage Adapter] Supabase 모드 사용 (실제 DB)');
+    return new SupabaseAdapter();
+  }
+  
+  // 서버 환경에서 Supabase가 없으면 메모리 어댑터 사용
   if (typeof window === 'undefined') {
-    console.log('[Storage Adapter] 서버 환경 - 메모리 어댑터 사용');
+    console.log('[Storage Adapter] 서버 환경 - 메모리 어댑터 사용 (Supabase 미설정)');
     const { MemoryStorageAdapter } = require('./memory-storage-adapter');
     return new MemoryStorageAdapter();
   }
   
   // 클라이언트 환경에서는 LocalStorage 사용
-  console.log('[Storage Adapter] 클라이언트 환경 - LocalStorage 사용');
+  console.log('[Storage Adapter] LocalStorage 모드 사용 (Supabase 미설정)');
   return new LocalStorageAdapter();
 }
 
