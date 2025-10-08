@@ -45,12 +45,79 @@ export type SupabaseKeyword = Database['public']['Tables']['keywords']['Row'];
  */
 export class SupabaseAdapter implements StorageAdapter {
   async getKeywords(): Promise<Dataset> {
-    console.log('[Supabase Adapter] 키워드 조회 (더미)');
-    return [];
+    console.log('[Supabase Adapter] 키워드 조회 시작');
+    const { supabase } = await import('./supabase/client');
+    
+    if (!supabase) {
+      console.warn('[Supabase Adapter] Supabase 클라이언트가 null - 키워드 조회 건너뜀');
+      return [];
+    }
+
+    try {
+      const { data, error } = await (supabase as any)
+        .from('keywords')
+        .select('*')
+        .order('total_search', { ascending: false });
+
+      if (error) {
+        console.error('[Supabase Adapter] 키워드 조회 오류:', error);
+        return [];
+      }
+
+      console.log(`[Supabase Adapter] ✅ ${data?.length || 0}개 키워드 조회 완료`);
+      return data || [];
+    } catch (error) {
+      console.error('[Supabase Adapter] 키워드 조회 예외:', error);
+      return [];
+    }
   }
 
   async addKeywords(results: any[]): Promise<void> {
-    console.log(`[Supabase Adapter] ${results.length}개 키워드 추가 (더미)`);
+    console.log(`[Supabase Adapter] ${results.length}개 키워드 추가 시작`);
+    const { supabaseAdmin } = await import('./supabase/client');
+    
+    if (!supabaseAdmin) {
+      console.warn('[Supabase Adapter] Supabase Admin 클라이언트가 null - 키워드 추가 건너뜀');
+      return;
+    }
+
+    try {
+      // KeywordData를 Supabase 형식으로 변환
+      const supabaseData = results.map(result => ({
+        keyword: result.keyword,
+        monthly_pc_search: result.monthlyPcSearch || 0,
+        monthly_mobile_search: result.monthlyMobileSearch || 0,
+        total_search: result.totalSearch || 0,
+        competition: result.competition || '중',
+        monthly_pc_clicks: result.monthlyPcClicks || 0,
+        monthly_mobile_clicks: result.monthlyMobileClicks || 0,
+        monthly_pc_click_rate: result.monthlyPcClickRate || 0,
+        monthly_mobile_click_rate: result.monthlyMobileClickRate || 0,
+        monthly_ad_count: result.monthlyAdCount || 0,
+        blog_total_count: result.blogTotalCount || 0,
+        cafe_total_count: result.cafeTotalCount || 0,
+        news_total_count: result.newsTotalCount || 0,
+        webkr_total_count: result.webkrTotalCount || 0,
+        queried_at: new Date().toISOString(),
+        root_keyword: result.keyword,
+        used_as_seed: false,
+        seed_depth: 0
+      }));
+
+      const { error } = await (supabaseAdmin as any)
+        .from('keywords')
+        .upsert(supabaseData, { onConflict: 'keyword' });
+
+      if (error) {
+        console.error('[Supabase Adapter] 키워드 추가 오류:', error);
+        throw error;
+      }
+
+      console.log(`[Supabase Adapter] ✅ ${results.length}개 키워드 추가 완료`);
+    } catch (error) {
+      console.error('[Supabase Adapter] 키워드 추가 예외:', error);
+      throw error;
+    }
   }
   
   async updateDocumentCounts(keyword: string, counts: DocumentCounts): Promise<void> {
