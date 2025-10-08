@@ -177,9 +177,9 @@ export class LocalStorageAdapter implements StorageAdapter {
     return [];
   }
 
-  async markAsUsedSeed(keywords: string[]): Promise<void> {
+  async markAsUsedSeed(keyword: string): Promise<void> {
     // localStorage에서는 시드 키워드 추적이 없으므로 아무것도 하지 않음
-    console.log('[LocalStorage Adapter] 시드 키워드 사용 표시 (지원 안 함):', keywords.length);
+    console.log('[LocalStorage Adapter] 시드 키워드 사용 표시 (지원 안 함):', keyword);
   }
 
   async getKeywordStats(): Promise<{ total: number; withDocCounts: number; withoutDocCounts: number }> {
