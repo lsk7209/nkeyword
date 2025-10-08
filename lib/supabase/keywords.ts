@@ -173,6 +173,11 @@ export async function deleteKeywords(keywordIds: number[]) {
  * 전체 키워드 삭제
  */
 export async function clearAllKeywords() {
+  if (!supabaseAdmin) {
+    console.warn('[Supabase Keywords] Supabase Admin 클라이언트가 null - 전체 키워드 삭제 건너뜀');
+    return;
+  }
+
   const { error } = await supabaseAdmin
     .from('keywords')
     .delete()
