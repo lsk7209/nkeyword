@@ -79,7 +79,7 @@ export class SupabaseAdapter implements StorageAdapter {
       webkr_total_count: result.webkrTotalCount,
       }));
       
-    const { error } = await supabaseAdmin.from('keywords').upsert(keywords, { onConflict: 'keyword' });
+    const { error } = await supabaseAdmin.from('keywords').upsert(keywords as any, { onConflict: 'keyword' });
       
     if (error) {
       console.error('[Supabase Adapter] 키워드 추가 오류:', error);
@@ -99,7 +99,7 @@ export class SupabaseAdapter implements StorageAdapter {
           cafe_total_count: counts.cafe,
           news_total_count: counts.news,
           webkr_total_count: counts.webkr,
-        })
+        } as any)
         .eq('keyword', keyword);
       
     if (error) {
@@ -172,7 +172,7 @@ export class SupabaseAdapter implements StorageAdapter {
     const { supabaseAdmin } = await import('./supabase/client');
     
     const { error } = await supabaseAdmin.from('keywords')
-      .update({ root_keyword: keyword })
+      .update({ root_keyword: keyword } as any)
         .eq('keyword', keyword);
       
     if (error) {
