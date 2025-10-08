@@ -213,14 +213,14 @@ export async function updateDocumentCounts(
     return;
   }
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('keywords')
     .update({
       blog_total_count: counts.blog,
       cafe_total_count: counts.cafe,
       news_total_count: counts.news,
       webkr_total_count: counts.webkr,
-    } as any)
+    })
     .eq('keyword', keyword);
 
   if (error) {
