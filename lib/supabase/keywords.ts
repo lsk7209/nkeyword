@@ -53,6 +53,11 @@ export async function getKeywords(
     sortOrder = 'desc',
   } = filters;
 
+  if (!supabase) {
+    console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 키워드 조회 건너뜀');
+    return { data: [], count: 0 };
+  }
+
   let query = supabase
     .from('keywords')
     .select('*', { count: 'exact' });
@@ -244,6 +249,11 @@ export async function getKeywordsWithoutDocCounts(limit = 100): Promise<string[]
  * 미사용 시드 키워드 조회
  */
 export async function getUnusedSeedKeywords(limit = 10) {
+  if (!supabase) {
+    console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 미사용 시드 키워드 조회 건너뜀');
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('keywords')
     .select('*')
@@ -263,6 +273,11 @@ export async function getUnusedSeedKeywords(limit = 10) {
  * 시드로 표시
  */
 export async function markAsUsedSeed(keyword: string) {
+  if (!supabase) {
+    console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 시드 표시 건너뜀');
+    return;
+  }
+
   const { error } = await supabase
     .from('keywords')
     .update({ used_as_seed: true })
@@ -278,6 +293,11 @@ export async function markAsUsedSeed(keyword: string) {
  * 통계 조회
  */
 export async function getKeywordStats() {
+  if (!supabase) {
+    console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 통계 조회 건너뜀');
+    return null;
+  }
+
   const { data, error } = await supabase
     .from('keyword_performance_stats')
     .select('*')
