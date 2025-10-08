@@ -312,9 +312,9 @@ export class HybridStorage {
     return await this.supabaseAdapter.getUnusedSeedKeywords();
   }
 
-  async markAsUsedSeed(keywords: string[]): Promise<void> {
+  async markAsUsedSeed(keyword: string): Promise<void> {
     // Supabase에서만 시드 키워드 추적
-    await this.supabaseAdapter.markAsUsedSeed(keywords);
+    await this.supabaseAdapter.markAsUsedSeed(keyword);
   }
 
   async getKeywordStats(): Promise<{ total: number; withDocCounts: number; withoutDocCounts: number }> {
