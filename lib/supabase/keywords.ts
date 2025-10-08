@@ -124,6 +124,11 @@ export async function upsertKeywords(keywords: Partial<KeywordData>[]) {
     return;
   }
 
+  if (!supabaseAdmin) {
+    console.warn('[Supabase Keywords] Supabase Admin 클라이언트가 null - 키워드 업서트 건너뜀');
+    return;
+  }
+
   const { data, error } = await supabaseAdmin
     .from('keywords')
     .upsert(keywords as any, {
@@ -143,6 +148,11 @@ export async function upsertKeywords(keywords: Partial<KeywordData>[]) {
  * 키워드 삭제
  */
 export async function deleteKeywords(keywordIds: number[]) {
+  if (!supabase) {
+    console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 키워드 삭제 건너뜀');
+    return;
+  }
+
   const { error } = await supabase
     .from('keywords')
     .delete()
@@ -186,6 +196,11 @@ export async function updateDocumentCounts(
     return;
   }
 
+  if (!supabase) {
+    console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 문서수 업데이트 건너뜀');
+    return;
+  }
+
   const { error } = await supabase
     .from('keywords')
     .update({
@@ -206,6 +221,11 @@ export async function updateDocumentCounts(
  * 문서수 없는 키워드 조회
  */
 export async function getKeywordsWithoutDocCounts(limit = 100): Promise<string[]> {
+  if (!supabase) {
+    console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 문서수 없는 키워드 조회 건너뜀');
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('keywords')
     .select('keyword')
