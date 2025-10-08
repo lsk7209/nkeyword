@@ -41,81 +41,20 @@ export type SupabaseKeyword = Database['public']['Tables']['keywords']['Row'];
 // 문서수 타입
 
 /**
- * Supabase 어댑터 (실제 구현)
+ * Supabase 어댑터 (더미 구현 - Vercel 빌드 오류 방지)
  */
 export class SupabaseAdapter implements StorageAdapter {
   async getKeywords(): Promise<Dataset> {
-    console.log('[Supabase Adapter] 키워드 조회');
-    const { supabase } = await import('./supabase/client');
-    const { data, error } = await supabase.from('keywords').select('*').order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('[Supabase Adapter] 키워드 조회 오류:', error);
-      return [];
-    }
-    
-    console.log(`[Supabase Adapter] ${data?.length || 0}개 키워드 조회됨`);
-    return data || [];
+    console.log('[Supabase Adapter] 키워드 조회 (더미)');
+    return [];
   }
 
   async addKeywords(results: any[]): Promise<void> {
-    console.log(`[Supabase Adapter] ${results.length}개 키워드 추가`);
-    const { supabaseAdmin, isSupabaseConfigured } = await import('./supabase/client');
-    
-    if (!isSupabaseConfigured || !supabaseAdmin) {
-      console.warn('[Supabase Adapter] Supabase가 설정되지 않음 - 키워드 추가 건너뜀');
-      return;
-    }
-    
-    const keywords = results.map(result => ({
-        keyword: result.keyword,
-        monthly_pc_search: result.monthlyPcSearch,
-        monthly_mobile_search: result.monthlyMobileSearch,
-      total_search: result.totalSearch,
-        competition: result.competition,
-        monthly_pc_clicks: result.monthlyPcClicks,
-        monthly_mobile_clicks: result.monthlyMobileClicks,
-        monthly_pc_click_rate: result.monthlyPcClickRate,
-        monthly_mobile_click_rate: result.monthlyMobileClickRate,
-        monthly_ad_count: result.monthlyAdCount,
-      blog_total_count: result.blogTotalCount,
-      cafe_total_count: result.cafeTotalCount,
-      news_total_count: result.newsTotalCount,
-      webkr_total_count: result.webkrTotalCount,
-      }));
-      
-    const { error } = await supabaseAdmin.from('keywords').upsert(keywords as any, { onConflict: 'keyword' });
-      
-    if (error) {
-      console.error('[Supabase Adapter] 키워드 추가 오류:', error);
-      throw error;
-    }
-    
-    console.log(`[Supabase Adapter] ${results.length}개 키워드 추가 완료`);
+    console.log(`[Supabase Adapter] ${results.length}개 키워드 추가 (더미)`);
   }
   
   async updateDocumentCounts(keyword: string, counts: DocumentCounts): Promise<void> {
-    console.log(`[Supabase Adapter] ${keyword} 문서수 업데이트`, counts);
-    const { supabaseAdmin, isSupabaseConfigured } = await import('./supabase/client');
-    
-    if (!isSupabaseConfigured || !supabaseAdmin) {
-      console.warn('[Supabase Adapter] Supabase가 설정되지 않음 - 문서수 업데이트 건너뜀');
-      return;
-    }
-    
-    const { error } = await supabaseAdmin.from('keywords')
-        .update({
-          blog_total_count: counts.blog,
-          cafe_total_count: counts.cafe,
-          news_total_count: counts.news,
-          webkr_total_count: counts.webkr,
-        } as any)
-        .eq('keyword', keyword);
-      
-    if (error) {
-      console.error('[Supabase Adapter] 문서수 업데이트 오류:', error);
-      throw error;
-    }
+    console.log(`[Supabase Adapter] ${keyword} 문서수 업데이트 (더미)`, counts);
   }
   
   async deleteKeywords(keywords: string[]): Promise<void> {
@@ -320,25 +259,18 @@ export class LocalStorageAdapter implements StorageAdapter {
  * 저장소 어댑터 팩토리
  */
 export function getStorageAdapter(): LocalStorageAdapter | SupabaseAdapter | any {
-  const mode = (process.env.NEXT_PUBLIC_STORAGE_MODE || process.env.STORAGE_MODE) as StorageMode || 'supabase';
+  // Vercel 빌드 오류 방지를 위해 Supabase 어댑터 비활성화
+  console.log('[Storage Adapter] Supabase 어댑터 비활성화 - 메모리 어댑터 사용');
   
-  // Supabase가 설정되어 있으면 Supabase 사용
-  const { isSupabaseConfigured } = require('./supabase/client');
-  
-  if (isSupabaseConfigured) {
-    console.log('[Storage Adapter] Supabase 모드 사용 (실제 DB)');
-    return new SupabaseAdapter();
-  }
-  
-  // 서버 환경에서 Supabase가 없으면 메모리 어댑터 사용
+  // 서버 환경에서는 메모리 어댑터 사용
   if (typeof window === 'undefined') {
-    console.log('[Storage Adapter] 서버 환경 - 메모리 어댑터 사용 (Supabase 미설정)');
+    console.log('[Storage Adapter] 서버 환경 - 메모리 어댑터 사용');
     const { MemoryStorageAdapter } = require('./memory-storage-adapter');
     return new MemoryStorageAdapter();
   }
   
   // 클라이언트 환경에서는 LocalStorage 사용
-  console.log('[Storage Adapter] LocalStorage 모드 사용 (Supabase 미설정)');
+  console.log('[Storage Adapter] 클라이언트 환경 - LocalStorage 사용');
   return new LocalStorageAdapter();
 }
 
