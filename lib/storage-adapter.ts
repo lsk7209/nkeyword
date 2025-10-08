@@ -60,7 +60,12 @@ export class SupabaseAdapter implements StorageAdapter {
 
   async addKeywords(results: any[]): Promise<void> {
     console.log(`[Supabase Adapter] ${results.length}개 키워드 추가`);
-    const { supabaseAdmin } = await import('./supabase/client');
+    const { supabaseAdmin, isSupabaseConfigured } = await import('./supabase/client');
+    
+    if (!isSupabaseConfigured) {
+      console.warn('[Supabase Adapter] Supabase가 설정되지 않음 - 키워드 추가 건너뜀');
+      return;
+    }
     
     const keywords = results.map(result => ({
         keyword: result.keyword,
@@ -91,7 +96,12 @@ export class SupabaseAdapter implements StorageAdapter {
   
   async updateDocumentCounts(keyword: string, counts: DocumentCounts): Promise<void> {
     console.log(`[Supabase Adapter] ${keyword} 문서수 업데이트`, counts);
-    const { supabaseAdmin } = await import('./supabase/client');
+    const { supabaseAdmin, isSupabaseConfigured } = await import('./supabase/client');
+    
+    if (!isSupabaseConfigured) {
+      console.warn('[Supabase Adapter] Supabase가 설정되지 않음 - 문서수 업데이트 건너뜀');
+      return;
+    }
     
     const { error } = await supabaseAdmin.from('keywords')
         .update({
@@ -169,7 +179,12 @@ export class SupabaseAdapter implements StorageAdapter {
   
   async markAsUsedSeed(keyword: string): Promise<void> {
     console.log(`[Supabase Adapter] ${keyword} 시드 사용으로 표시`);
-    const { supabaseAdmin } = await import('./supabase/client');
+    const { supabaseAdmin, isSupabaseConfigured } = await import('./supabase/client');
+    
+    if (!isSupabaseConfigured) {
+      console.warn('[Supabase Adapter] Supabase가 설정되지 않음 - 시드 사용 표시 건너뜀');
+      return;
+    }
     
     const { error } = await supabaseAdmin.from('keywords')
       .update({ root_keyword: keyword } as any)
