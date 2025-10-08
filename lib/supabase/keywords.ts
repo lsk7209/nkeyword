@@ -1,4 +1,4 @@
-import { supabase, supabaseAdmin } from './client';
+import { supabase, supabaseAdmin, isSupabaseConfigured } from './client';
 import type { KeywordData } from '@/lib/types';
 
 export interface FilterOptions {
@@ -119,6 +119,11 @@ export async function getKeywords(
  * 키워드 추가 (중복 시 업데이트)
  */
 export async function upsertKeywords(keywords: Partial<KeywordData>[]) {
+  if (!isSupabaseConfigured) {
+    console.warn('[Supabase Keywords] Supabase가 설정되지 않음 - 키워드 업서트 건너뜀');
+    return;
+  }
+
   const { data, error } = await supabaseAdmin
     .from('keywords')
     .upsert(keywords as any, {
@@ -176,6 +181,11 @@ export async function updateDocumentCounts(
     webkr?: number;
   }
 ) {
+  if (!isSupabaseConfigured) {
+    console.warn('[Supabase Keywords] Supabase가 설정되지 않음 - 문서수 업데이트 건너뜀');
+    return;
+  }
+
   const { error } = await supabase
     .from('keywords')
     .update({
