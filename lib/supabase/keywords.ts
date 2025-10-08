@@ -206,6 +206,8 @@ export async function updateDocumentCounts(
     return;
   }
 
+  const { supabase } = await import('./client');
+  
   if (!supabase) {
     console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 문서수 업데이트 건너뜀');
     return;
