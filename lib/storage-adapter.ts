@@ -7,6 +7,17 @@
 import type { StoredRow, Dataset } from './storage';
 import type { Database } from './supabase/types';
 
+// Dataset 타입 re-export
+export type { Dataset } from './storage';
+
+// DocumentCounts 타입 export
+export interface DocumentCounts {
+  blog: number;
+  cafe: number;
+  news: number;
+  webkr: number;
+}
+
 // 저장소 모드
 export type StorageMode = 'localStorage' | 'supabase';
 
@@ -28,12 +39,6 @@ export interface StorageAdapter {
 export type SupabaseKeyword = Database['public']['Tables']['keywords']['Row'];
 
 // 문서수 타입
-export interface DocumentCounts {
-  blog?: number;
-  cafe?: number;
-  news?: number;
-  webkr?: number;
-}
 
 /**
  * Supabase 어댑터 (실제 구현)
