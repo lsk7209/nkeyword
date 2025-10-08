@@ -55,7 +55,7 @@ export async function getKeywords(
 
   if (!supabase) {
     console.warn('[Supabase Keywords] Supabase 클라이언트가 null - 키워드 조회 건너뜀');
-    return { data: [], count: 0 };
+    return { data: [], total: 0 };
   }
 
   let query = supabase
