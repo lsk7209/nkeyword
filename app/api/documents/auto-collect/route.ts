@@ -72,6 +72,14 @@ export async function POST(request: NextRequest) {
     
     const { supabase } = await import('@/lib/supabase/client');
     
+    if (!supabase) {
+      logger.error('[AUTO-COLLECT] Supabase 클라이언트가 null입니다.');
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Supabase 클라이언트가 설정되지 않았습니다.' 
+      }, { status: 500 });
+    }
+    
     // 1. 문서수가 없는 키워드 조회
     const { data: keywords, error: fetchError } = await supabase
       .from('keywords')
