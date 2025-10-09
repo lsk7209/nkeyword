@@ -105,10 +105,36 @@ export async function POST(request: NextRequest) {
       console.log('[테스트 데이터] 키워드 저장 완료');
     } catch (error) {
       console.error('[테스트 데이터] 저장 오류:', error);
+      
+      // 오류 객체를 안전하게 직렬화
+      let errorMessage = 'Unknown error';
+      let errorType = 'Unknown';
+      let errorStack = undefined;
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        errorType = error.name;
+        errorStack = error.stack;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+        errorType = 'StringError';
+      } else if (error && typeof error === 'object') {
+        try {
+          errorMessage = JSON.stringify(error);
+          errorType = 'ObjectError';
+        } catch (jsonError) {
+          errorMessage = String(error);
+          errorType = 'SerializationError';
+        }
+      } else {
+        errorMessage = String(error);
+        errorType = 'UnknownType';
+      }
+      
       console.error('[테스트 데이터] 오류 상세:', {
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-        name: error instanceof Error ? error.name : 'Unknown'
+        message: errorMessage,
+        stack: errorStack,
+        name: errorType
       });
       
       // 더 상세한 오류 정보 반환
@@ -116,8 +142,9 @@ export async function POST(request: NextRequest) {
         success: false, 
         error: '테스트 데이터 저장 실패',
         details: {
-          message: error instanceof Error ? error.message : String(error),
-          type: error instanceof Error ? error.name : 'Unknown'
+          message: errorMessage,
+          type: errorType,
+          stack: errorStack
         }
       }, { status: 500 });
     }
