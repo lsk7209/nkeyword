@@ -83,6 +83,7 @@ export class SupabaseAdapter implements StorageAdapter {
 
     try {
       // KeywordData를 Supabase 형식으로 변환 (id 제외, UUID 자동 생성)
+      const now = new Date().toISOString();
       const supabaseData = results.map(result => ({
         keyword: result.keyword,
         monthly_pc_search: result.monthlyPcSearch || 0,
@@ -98,10 +99,12 @@ export class SupabaseAdapter implements StorageAdapter {
         cafe_total_count: result.cafeTotalCount || 0,
         news_total_count: result.newsTotalCount || 0,
         webkr_total_count: result.webkrTotalCount || 0,
-        queried_at: new Date().toISOString(),
+        queried_at: now,
         root_keyword: result.keyword,
         used_as_seed: false,
-        seed_depth: 0
+        seed_depth: 0,
+        created_at: now,
+        updated_at: now
       }));
 
       console.log('[Supabase Adapter] 변환된 데이터:', JSON.stringify(supabaseData, null, 2));
@@ -132,7 +135,36 @@ export class SupabaseAdapter implements StorageAdapter {
   }
   
   async updateDocumentCounts(keyword: string, counts: DocumentCounts): Promise<void> {
-    console.log(`[Supabase Adapter] ${keyword} 문서수 업데이트 (더미)`, counts);
+    console.log(`[Supabase Adapter] ${keyword} 문서수 업데이트`, counts);
+    const { supabaseAdmin } = await import('./supabase/client');
+    
+    if (!supabaseAdmin) {
+      console.warn('[Supabase Adapter] Supabase Admin 클라이언트가 null - 문서수 업데이트 건너뜀');
+      return;
+    }
+    
+    try {
+      const { error } = await (supabaseAdmin as any)
+        .from('keywords')
+        .update({
+          blog_total_count: counts.blogTotalCount,
+          cafe_total_count: counts.cafeTotalCount,
+          news_total_count: counts.newsTotalCount,
+          webkr_total_count: counts.webkrTotalCount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('keyword', keyword);
+
+      if (error) {
+        console.error('[Supabase Adapter] 문서수 업데이트 오류:', error);
+        throw error;
+      }
+
+      console.log(`[Supabase Adapter] ✅ ${keyword} 문서수 업데이트 완료`);
+    } catch (error) {
+      console.error('[Supabase Adapter] 문서수 업데이트 예외:', error);
+      throw error;
+    }
   }
   
   async deleteKeywords(keywords: string[]): Promise<void> {
