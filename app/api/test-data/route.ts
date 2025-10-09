@@ -75,9 +75,9 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.error('[테스트 데이터] 저장 오류:', error);
       console.error('[테스트 데이터] 오류 상세:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown'
       });
       throw error;
     }
