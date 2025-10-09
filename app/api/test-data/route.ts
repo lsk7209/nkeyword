@@ -68,6 +68,37 @@ export async function POST(request: NextRequest) {
     const storageAdapter = getStorageAdapter();
     console.log('[테스트 데이터] 저장소 어댑터 타입:', storageAdapter.constructor.name);
     
+    // Supabase 연결 테스트
+    if (storageAdapter.constructor.name === 'SupabaseAdapter') {
+      console.log('[테스트 데이터] Supabase 연결 테스트 시작');
+      try {
+        const { testConnection } = await import('@/lib/supabase/client');
+        const isConnected = await testConnection();
+        console.log('[테스트 데이터] Supabase 연결 상태:', isConnected);
+        
+        if (!isConnected) {
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Supabase 연결 실패',
+            details: {
+              message: 'Supabase 데이터베이스에 연결할 수 없습니다.',
+              type: 'ConnectionError'
+            }
+          }, { status: 500 });
+        }
+      } catch (connectionError) {
+        console.error('[테스트 데이터] Supabase 연결 테스트 오류:', connectionError);
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Supabase 연결 테스트 실패',
+          details: {
+            message: connectionError instanceof Error ? connectionError.message : String(connectionError),
+            type: 'ConnectionTestError'
+          }
+        }, { status: 500 });
+      }
+    }
+    
     console.log('[테스트 데이터] 키워드 저장 시작');
     try {
       await storageAdapter.addKeywords(testData);
