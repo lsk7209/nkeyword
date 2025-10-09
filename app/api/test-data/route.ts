@@ -69,8 +69,13 @@ export async function POST(request: NextRequest) {
       console.log('[테스트 데이터] 저장소 어댑터 타입:', storageAdapter.constructor.name);
       
       console.log('[테스트 데이터] 키워드 저장 시작');
-      await storageAdapter.addKeywords(testData);
-      console.log('[테스트 데이터] 키워드 저장 완료');
+      try {
+        await storageAdapter.addKeywords(testData);
+        console.log('[테스트 데이터] 키워드 저장 완료');
+      } catch (error) {
+        console.error('[테스트 데이터] 저장 오류:', error);
+        throw error;
+      }
       
       console.log(`[테스트 데이터] 저장소에 ${testData.length}개 키워드 저장 완료`);
       console.log('[테스트 데이터] 저장된 데이터:', JSON.stringify(testData, null, 2));
