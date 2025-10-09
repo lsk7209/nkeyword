@@ -147,10 +147,10 @@ export class SupabaseAdapter implements StorageAdapter {
       const { error } = await (supabaseAdmin as any)
         .from('keywords')
         .update({
-          blog_total_count: counts.blogTotalCount,
-          cafe_total_count: counts.cafeTotalCount,
-          news_total_count: counts.newsTotalCount,
-          webkr_total_count: counts.webkrTotalCount,
+          blog_total_count: counts.blog,
+          cafe_total_count: counts.cafe,
+          news_total_count: counts.news,
+          webkr_total_count: counts.webkr,
           updated_at: new Date().toISOString()
         })
         .eq('keyword', keyword);
