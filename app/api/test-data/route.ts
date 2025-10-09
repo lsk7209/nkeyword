@@ -79,7 +79,16 @@ export async function POST(request: NextRequest) {
         stack: error instanceof Error ? error.stack : undefined,
         name: error instanceof Error ? error.name : 'Unknown'
       });
-      throw error;
+      
+      // 더 상세한 오류 정보 반환
+      return NextResponse.json({ 
+        success: false, 
+        error: '테스트 데이터 저장 실패',
+        details: {
+          message: error instanceof Error ? error.message : String(error),
+          type: error instanceof Error ? error.name : 'Unknown'
+        }
+      }, { status: 500 });
     }
       
       console.log(`[테스트 데이터] 저장소에 ${testData.length}개 키워드 저장 완료`);
