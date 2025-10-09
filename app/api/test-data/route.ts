@@ -63,19 +63,24 @@ export async function POST(request: NextRequest) {
         }
       ];
       
-      // 저장소 어댑터를 통해 저장
-      console.log('[테스트 데이터] 저장소 어댑터 가져오기 시작');
-      const storageAdapter = getStorageAdapter();
-      console.log('[테스트 데이터] 저장소 어댑터 타입:', storageAdapter.constructor.name);
-      
-      console.log('[테스트 데이터] 키워드 저장 시작');
-      try {
-        await storageAdapter.addKeywords(testData);
-        console.log('[테스트 데이터] 키워드 저장 완료');
-      } catch (error) {
-        console.error('[테스트 데이터] 저장 오류:', error);
-        throw error;
-      }
+    // 저장소 어댑터를 통해 저장
+    console.log('[테스트 데이터] 저장소 어댑터 가져오기 시작');
+    const storageAdapter = getStorageAdapter();
+    console.log('[테스트 데이터] 저장소 어댑터 타입:', storageAdapter.constructor.name);
+    
+    console.log('[테스트 데이터] 키워드 저장 시작');
+    try {
+      await storageAdapter.addKeywords(testData);
+      console.log('[테스트 데이터] 키워드 저장 완료');
+    } catch (error) {
+      console.error('[테스트 데이터] 저장 오류:', error);
+      console.error('[테스트 데이터] 오류 상세:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      throw error;
+    }
       
       console.log(`[테스트 데이터] 저장소에 ${testData.length}개 키워드 저장 완료`);
       console.log('[테스트 데이터] 저장된 데이터:', JSON.stringify(testData, null, 2));

@@ -82,7 +82,7 @@ export class SupabaseAdapter implements StorageAdapter {
     }
 
     try {
-      // KeywordData를 Supabase 형식으로 변환
+      // KeywordData를 Supabase 형식으로 변환 (id 제외, UUID 자동 생성)
       const supabaseData = results.map(result => ({
         keyword: result.keyword,
         monthly_pc_search: result.monthlyPcSearch || 0,
@@ -104,14 +104,25 @@ export class SupabaseAdapter implements StorageAdapter {
         seed_depth: 0
       }));
 
-      const { error } = await (supabaseAdmin as any)
+      console.log('[Supabase Adapter] 변환된 데이터:', JSON.stringify(supabaseData, null, 2));
+
+      const { data, error } = await (supabaseAdmin as any)
         .from('keywords')
-        .upsert(supabaseData, { onConflict: 'keyword' });
+        .upsert(supabaseData, { onConflict: 'keyword' })
+        .select();
 
       if (error) {
         console.error('[Supabase Adapter] 키워드 추가 오류:', error);
+        console.error('[Supabase Adapter] 오류 상세:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         throw error;
       }
+
+      console.log('[Supabase Adapter] upsert 결과:', data);
 
       console.log(`[Supabase Adapter] ✅ ${results.length}개 키워드 추가 완료`);
     } catch (error) {
